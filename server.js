@@ -6,6 +6,7 @@ import cors from 'cors';
 import tripRoutes from './routes/trips.js';
 import authRoutes from './routes/auth.js'; // Add authentication routes
 import itineraryRoutes from './routes/itinerary.js';
+import Trip from './models/Trip.js';
 
 
 
@@ -25,9 +26,22 @@ app.use(express.json());
 app.get('/api/test', (req, res) => {
   res.json({ 
     message: 'Backend is working!',
-    openaiKeyExists: !!process.env.OPEN_AI_API_KEY,
+    groqKeyExists: !!process.env.GROQ_API_KEY,
     mongoConnected: 'connecting...'
   });
+});
+
+// Debug endpoint - Check all trips in database
+app.get('/api/debug/all-trips', async (req, res) => {
+  try {
+    const trips = await Trip.find({});
+    res.json({ 
+      totalTrips: trips.length,
+      trips: trips
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // Routes
