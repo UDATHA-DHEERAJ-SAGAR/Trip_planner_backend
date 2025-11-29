@@ -21,6 +21,15 @@ app.use(cors({
 }));
 app.use(express.json());
 
+// Test endpoint
+app.get('/api/test', (req, res) => {
+  res.json({ 
+    message: 'Backend is working!',
+    openaiKeyExists: !!process.env.OPEN_AI_API_KEY,
+    mongoConnected: 'connecting...'
+  });
+});
+
 // Routes
 app.use('/api/trips', tripRoutes);
 app.use('/api/auth', authRoutes); // Add this route for login/register
