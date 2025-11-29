@@ -1,8 +1,12 @@
-import axios from 'axios';
+import OpenAI from 'openai';
 import dotenv from 'dotenv';
 import Itinerary from '../models/itinerary.js';
 
 dotenv.config();
+
+const openai = new OpenAI({
+  apiKey: process.env.OPEN_AI_API_KEY
+});
 
 export const generateItinerary = async (req, res) => {
   const { destination, duration, purpose } = req.body;
@@ -13,53 +17,45 @@ export const generateItinerary = async (req, res) => {
   }
 
   try {
-    const response = await axios.post(
-      'https://api.together.xyz/v1/chat/completions',
-      {
-        model: 'mistralai/Mixtral-8x7B-Instruct-v0.1',
-        messages: [
-          {
-            role: 'user',
-            content: `
-              Generate a ${duration}-day travel itinerary for ${destination}.
-              Purpose of the visit: ${purpose}.
+    const response = await openai.chat.completions.create({
+      model: 'gpt-3.5-turbo',
+      messages: [
+        {
+          role: 'user',
+          content: `Generate a ${duration}-day travel itinerary for ${destination}.
+Purpose of the visit: ${purpose}.
 
-              Include:
-              - Morning, afternoon, and evening activities
-              - Recommended local attractions
-              - Meal and rest breaks
-              - Best visiting hours
-              Format:
-              Day 1: ...
-              Day 2: ...
-            `
-          }
-        ],
-        temperature: 0.7
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.TOGETHER_API_KEY}`,
-          'Content-Type': 'application/json'
+Include:
+- Morning, afternoon, and evening activities
+- Recommended local attractions
+- Meal and rest breaks
+- Best visiting hours
+
+Format:
+Day 1: ...
+Day 2: ...
+etc.`
         }
-      }
-    );
+      ],
+      temperature: 0.7
+    });
 
-    const itineraryText = response.data.choices[0].message.content;
+    const itineraryText = response.choices[0].message.content;
     console.log('✅ Debug — userId being saved:', userId);
     const savedItinerary = await Itinerary.create({
       userId,
       destination,
       duration,
-      purpose, // 🆕 Save purpose
+      purpose,
       itinerary: itineraryText
     });
 
     res.status(201).json(savedItinerary);
 
   } catch (err) {
-    console.error('🛑 Together.ai Error:', err?.response?.data || err.message);
-    res.status(500).json({ error: 'Failed to generate itinerary' });
+    console.error('🛑 OpenAI Error:', err.message);
+    console.error('🛑 Full Error:', err);
+    res.status(500).json({ error: 'Failed to generate itinerary', details: err.message });
   }
 };
 

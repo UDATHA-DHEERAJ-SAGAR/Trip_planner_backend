@@ -8,6 +8,6 @@ const router = express.Router();
 router.post('/', auth, generateItinerary);
 
 // Get all itineraries of the logged-in user
-router.get('/ab', auth, getUserItineraries);
+router.get('/', auth, getUserItineraries);
 
 export default router;
