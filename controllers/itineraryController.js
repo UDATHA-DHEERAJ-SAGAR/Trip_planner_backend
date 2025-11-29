@@ -1,11 +1,11 @@
-import OpenAI from 'openai';
+import Groq from 'groq-sdk';
 import dotenv from 'dotenv';
 import Itinerary from '../models/itinerary.js';
 
 dotenv.config();
 
-const openai = new OpenAI({
-  apiKey: process.env.OPEN_AI_API_KEY
+const groq = new Groq({
+  apiKey: process.env.GROQ_API_KEY
 });
 
 export const generateItinerary = async (req, res) => {
@@ -17,8 +17,8 @@ export const generateItinerary = async (req, res) => {
   }
 
   try {
-    const response = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo',
+    const response = await groq.chat.completions.create({
+      model: 'mixtral-8x7b-32768',
       messages: [
         {
           role: 'user',
@@ -53,7 +53,7 @@ etc.`
     res.status(201).json(savedItinerary);
 
   } catch (err) {
-    console.error('🛑 OpenAI Error:', err.message);
+    console.error('🛑 Groq Error:', err.message);
     console.error('🛑 Full Error:', err);
     res.status(500).json({ error: 'Failed to generate itinerary', details: err.message });
   }
