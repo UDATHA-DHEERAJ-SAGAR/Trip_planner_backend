@@ -7,10 +7,14 @@ const router = express.Router();
 // Create a new trip (protected)
 router.post('/', auth, async (req, res) => {
   try {
+    console.log('📝 Creating trip with userId:', req.userId);
+    console.log('📝 Trip data:', req.body);
     const trip = new Trip({ ...req.body, userId: req.userId });
     const savedTrip = await trip.save();
+    console.log('✅ Trip saved:', savedTrip);
     res.status(201).json(savedTrip);
   } catch (err) {
+    console.error('❌ Error creating trip:', err.message);
     res.status(400).json({ error: err.message });
   }
 });
@@ -18,9 +22,12 @@ router.post('/', auth, async (req, res) => {
 // Get all trips for the logged-in user (protected)
 router.get('/', auth, async (req, res) => {
   try {
+    console.log('🔍 Fetching trips for userId:', req.userId);
     const trips = await Trip.find({ userId: req.userId });
+    console.log('✅ Found trips:', trips);
     res.json(trips);
   } catch (err) {
+    console.error('❌ Error fetching trips:', err.message);
     res.status(500).json({ error: err.message });
   }
 });
