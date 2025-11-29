@@ -15,7 +15,10 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-app.use(cors(https://trip-planner-frontend-vtah.onrender.com));
+app.use(cors({
+  origin: 'https://trip-planner-frontend-vtah.onrender.com',
+  credentials: true
+}));
 app.use(express.json());
 
 // Routes
@@ -35,3 +38,4 @@ mongoose.connect(process.env.MONGO_URI, {
 .catch((err) => {
   console.error('❌ MongoDB connection failed:', err.message);
 });
+
