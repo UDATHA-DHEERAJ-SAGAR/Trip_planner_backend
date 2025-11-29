@@ -18,7 +18,7 @@ export const generateItinerary = async (req, res) => {
 
   try {
     const response = await groq.chat.completions.create({
-      model: 'mixtral-8x7b-32768',
+      model: 'llama-3.1-8b-instant',
       messages: [
         {
           role: 'user',
@@ -37,7 +37,8 @@ Day 2: ...
 etc.`
         }
       ],
-      temperature: 0.7
+      temperature: 0.7,
+      max_tokens: 1024
     });
 
     const itineraryText = response.choices[0].message.content;
